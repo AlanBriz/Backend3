@@ -2,6 +2,7 @@ import { Router } from "express";
 import bcrypt from "bcrypt";
 import userModel from "../dao/models/User.js";
 import petModel from "../dao/models/Pet.js";
+import { faker } from '@faker-js/faker';
 
 const router = Router();
 
@@ -9,29 +10,16 @@ const router = Router();
 MOCKING USERS (GET)
 ============================ */
 
+import { generateMockUsers } from "../utils/mockingUsers.js";
+
 router.get("/mockingusers", async (req, res) => {
     try {
-        const users = [];
-
-        for (let i = 0; i < 50; i++) {
-            const hashedPassword = await bcrypt.hash("coder123", 10);
-
-            users.push({
-                _id: new userModel()._id, // simulate Mongo _id
-                first_name: `User${i}`,
-                last_name: `Test${i}`,
-                email: `user${i}@mock.com`,
-                password: hashedPassword,
-                role: Math.random() > 0.5 ? "admin" : "user",
-                pets: []
-            });
-        }
+        const users = await generateMockUsers(50);
 
         res.status(200).json({
             status: "success",
             payload: users
         });
-
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -61,17 +49,16 @@ router.post("/generateData", async (req, res) => {
             const hashedPassword = await bcrypt.hash("coder123", 10);
 
             const newUser = await userModel.create({
-                first_name: `Generated${i}`,
-                last_name: `User${i}`,
-                email: `generated${i}@mail.com`,
+                first_name: faker.person.firstName(),
+                last_name: faker.person.lastName(),
+                email: faker.internet.email(),
                 password: hashedPassword,
-                role: Math.random() > 0.5 ? "admin" : "user",
+                role: faker.helpers.arrayElement(["user","admin"]),
                 pets: []
             });
 
             createdUsers.push(newUser);
         }
-
         // Generate Pets
         for (let i = 0; i < pets; i++) {
             const newPet = await petModel.create({
