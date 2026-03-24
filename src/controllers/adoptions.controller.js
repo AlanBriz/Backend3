@@ -13,7 +13,12 @@ const getAdoption = async(req,res)=>{
 }
 
 const createAdoption = async(req,res)=>{
+  try{
     const {uid,pid} = req.params;
+            // Validate ObjectIDs
+        if (!mongoose.Types.ObjectId.isValid(uid) || !mongoose.Types.ObjectId.isValid(pid)) {
+            return res.status(400).send({ status: "error", error: "Invalid IDs" });
+        }
     const user = await usersService.getUserById(uid);
     if(!user) return res.status(404).send({status:"error", error:"user Not found"});
     const pet = await petsService.getBy({_id:pid});
@@ -24,6 +29,9 @@ const createAdoption = async(req,res)=>{
     await petsService.update(pet._id,{adopted:true,owner:user._id})
     await adoptionsService.create({owner:user._id,pet:pet._id})
     res.send({status:"success",message:"Pet adopted"})
+      } catch (error) {
+        res.status(500).send({ status: "error", error: error.message });
+    }
 }
 
 export default {

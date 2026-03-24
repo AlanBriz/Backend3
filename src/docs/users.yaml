@@ -1,0 +1,28 @@
+paths:
+  /api/users:
+    get:
+      summary: Get all users
+      responses:
+        200:
+          description: OK
+
+    post:
+      summary: Create user
+      responses:
+        200:
+          description: Created
+
+  /api/users/{uid}:
+    get:
+      summary: Get user by ID
+      parameters:
+        - name: uid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK
+        404:
+          description: Not found
