@@ -29,5 +29,4 @@ describe("Adoption Router Tests", () => {
 
         expect(response.status).to.be.oneOf([400, 404, 500]);
     });
-
 });
